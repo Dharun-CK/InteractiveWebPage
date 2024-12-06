@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fireworks on Mouse Click</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        var particles = [];
+
+        // Set canvas size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Firework class
+        class Firework {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = Math.random() * 2 - 1;
+                this.vy = Math.random() * -3 - 4;
+                this.gravity = 0.1;
+                this.alpha = 1;
+                this.color = getRandomColor();
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += this.gravity;
+                this.alpha -= 0.01;
+
+                if (this.alpha <= 0) {
+                    particles.splice(particles.indexOf(this), 1);
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha;
+                ctx.fill();
+            }
+        }
+
+        // Add event listener for mouse click
+        document.addEventListener("mousedown", function (event) {
+            var x = event.clientX;
+            var y = event.clientY;
+            createFirework(x, y);
+        });
+
+        // Create fireworks
+        function createFirework(x, y) {
+            var firework = new Firework(x, y);
+            particles.push(firework);
+        }
+
+        // Update and draw particles
+        function updateParticles() {
+            for (var i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+        }
+
+        // Animation loop
+        function loop() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            updateParticles();
+            requestAnimationFrame(loop);
+        }
+
+        // Generate random color
+        function getRandomColor() {
+            var letters = "0123456789ABCDEF";
+            var color = "#";
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Start the animation loop
+        loop();
+    </script>
+</body>
+</html>
